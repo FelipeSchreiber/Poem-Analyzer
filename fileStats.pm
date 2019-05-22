@@ -1,3 +1,13 @@
+package fileStats;
+use strict;
+use warnings;
+use Exporter 'import';
+our $VERSION = '1.00';
+our @ISA= qw( Exporter );
+# these CAN be exported.
+our @EXPORT_OK = qw(fileStats);
+our @EXPORT = qw(fileStats);
+
 sub fileStats {
  my $fdescriptor = shift;
  my $line;
@@ -30,10 +40,4 @@ sub fileStats {
  return @stats;
 }
 
-
-open(my $fd, "<", "file.txt") or die "Couldn't open the file, $!";
-@fileInfo = fileStats($fd);
-close $fd || die "Couldn't close file properly";
-foreach my $data (@fileInfo){
- print $data, "\n";
-}
+1;
