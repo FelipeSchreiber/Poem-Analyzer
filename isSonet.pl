@@ -40,7 +40,10 @@ sub isSonnet{
     @aux = ();
     if(substr($words[$var],-1,1) eq "s")
     {
-     @aux = split(/\s/,$data->{(substr($words[$var],0,(length($words[$var]) - 1)))});#tenta ver se encontra a palavra no singular
+     if(exists $data->{substr($words[$var],0,length($words[$var]) - 1)} )
+     {
+      @aux = split(/\s/,$data->{(substr($words[$var],0,(length($words[$var]) - 1)))});#tenta ver se encontra a palavra no singular
+     }
     }
 
     if(substr($words[$var],-2,2) eq "ed")

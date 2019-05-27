@@ -4,7 +4,6 @@ use utf8;
 use diagnostics;
 use phonemeParser;
 
-
 sub getHighestKey{
 	my %hash = %{$_[0]};
 	my $max = "a";			#compare -1 with a
@@ -26,12 +25,12 @@ sub determinaRima{
   my $dictionary = loadPhonemes("cmudict-0.7b");
   my %vowels;
   my $phones = loadPhonemes("cmudict.0.7a.phones");
- while (my ($key, $value) = each(%{$phones})) {
+  while (my ($key, $value) = each(%{$phones})) {
    if($value eq "vowel") 
    {
     $vowels{$key} = $value; #coloca todas as vogais num dicionario a parte
    }
- }
+  }
   my $aux;#essa variavel armazena a palavra com a qual esta sendo comparada e ja esta no hash
 	my $curChar = "a";
 	my $divEst = " ";

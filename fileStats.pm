@@ -21,7 +21,7 @@ sub fileStats {
   $line = $_;
   if(length($line) eq 1)
   {
-   print "Nova estrofe\n";
+   #print "Nova estrofe\n";
    $totalEstrofes = $totalEstrofes + 1;
   }
   else
