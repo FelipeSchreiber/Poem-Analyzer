@@ -45,6 +45,14 @@ sub isSonnet{
 
     if(substr($words[$var],-2,2) eq "ed")
     {
+     if(exists $data->{substr($words[$var],0,length($words[$var]) - 1)} )
+     {
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 1)});#caso em que o verbo terminado em "-e" foi acrescido do "d" ex: loved
+     }
+		 if(exists $data->{substr($words[$var],0,length($words[$var]) - 2)} )
+     {
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 2)});#caso em que o verbo foi acrescido de"-ed" ex: locked
+     }
      if(exists $data->{substr($words[$var],0,length($words[$var]) - 3)} )
      {
       @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)});#caso em que alem do "-ed" acrescentado a ultima consoante foi duplicada ex: stopped
@@ -52,12 +60,8 @@ sub isSonnet{
      if(exists $data->{substr($words[$var],0,length($words[$var]) - 3)."y"} )
      {
       @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)."y"});#caso em que o verbo termina em "y" ex: studied. Tambem contempla o caso de palavras terminadas em y com vogal antes. Ex: enjoyed
-     }
-     if(exists $data->{substr($words[$var],0,length($words[$var]) - 1)} )
-     {
-      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 1)});#caso em que o verbo terminado em "-e" foi acrescido do "d" ex: loved
-     }		 
-    }
+     }    	
+	  }
 
     if(substr($words[$var],-3,3) eq "ing")
     {
