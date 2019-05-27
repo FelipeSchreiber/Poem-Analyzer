@@ -3,7 +3,8 @@ use warnings;
 use utf8;
 
 sub loadDatabase{
- my $database = shift;
+ my $database = shift;#dicionario que sera usado para separar as palavras em silabas
+ $database //= "mhyph.txt";
  #print $database, "\n";
  my $line;
  my %dict;
@@ -16,8 +17,8 @@ sub loadDatabase{
   chomp($line);
   ($key = $line) =~ s/\s/_/g;
   #assume que a busca de palavras como "a priori" sera feita buscando a chave a_priori, ja que usaremos espaco para separar palavras
-  $key =~ s/¥//g;
-  $key = substr $key,0,((length $key) - 1);
+  $key =~ s/¥//g;#supoe que o token de separacao das silabas eh esse
+  $key = substr $key,0,((length $key) - 1);#retira o "_" do final da palavra
   #print "-$key--\n";
   $line =~ s/¥/ /g;
   $dict{$key} = $line;
@@ -28,10 +29,9 @@ sub loadDatabase{
  return \%dict;
 }
 
-
 my $key;
 my $value;
-my $data = loadDatabase("mhyph.txt");
+my $data = loadDatabase();
 print $data;
 #while(($key, $value) = each(%$data)) {
 #    print "$key => $value\n";

@@ -11,40 +11,25 @@ our @EXPORT = qw( loadPhonemes rhymeFound isNotVowel checkAliteration);
 
 #busca por fonemas iguais de uma palavra em outra, independente da posicao
 sub checkAliteration{
- my $word1 = shift;
- my $word2 = shift;
- my $dict = shift;
- my @differentPronouncesOfWord1;#palavras podem ter mais de uma pronuncia 
- my @differentPronouncesOfWord2; 
- my $index = 1;
+ my $differentPronouncesOfWord1 = shift;#palavras podem ter mais de uma pronuncia 
+ my $differentPronouncesOfWord2 = shift; 
+ my $index = 0;
  my $copy;
  my @phonemes;
- push(@differentPronouncesOfWord1,$dict->{$word1});
- push(@differentPronouncesOfWord2,$dict->{$word2}); 
- while((exists $dict->{$word1."($index)"}))#palavras com mais de uma pronuncia aparecem no dicionario na forma: palavra, palavra(1), palavra(2)...
- {
-  push(@differentPronouncesOfWord1,$dict->{$word1."($index)"});
-  $index++;
- }
- $index = 1;
- while((exists $dict->{$word2."($index)"}))
- {
-  push(@differentPronouncesOfWord2,$dict->{$word2."($index)"});
-  $index++;
- }
- foreach my $first (@differentPronouncesOfWord1) 
+ foreach my $first (@{$differentPronouncesOfWord1}) 
  { 
   $first =~ s/(\d)//g;#remove os digitos 0,1 e 2 que marcam o tipo de pronuncia tonica ou atona ou intermediario
   (@phonemes) = split(/\s/,$first);
-  foreach my $second (@differentPronouncesOfWord2) 
+  foreach my $second (@{$differentPronouncesOfWord2}) 
   { 
    $second =~ s/(\d)//g;
+	 #print $first." - ".$second."\n";
    for $index (0 .. $#phonemes)
    {
     ($copy = $second) =~ s/$phonemes[$index]//g;
+		#print $copy." - ".$second."\n";
     if($copy ne $second) #checa se apos o regex a palavra sofreu alguma alteracao.Se sim, significa esse fonema esta presente   
     {
-     #print $copy." - ".$second."\n";
      return 1;
     }
    }
@@ -85,10 +70,7 @@ sub rhymeFound{
  my $dict = shift;
  my $vowels = shift;
  my $params = shift;#tem varias opcoes que podem ser passadas: checa apenas a ultima vogal e em diante sao iguais por default, se for multiplo de 3, checa apenas rimas perfeitas (vogais tonicas e em diante sao iguais) e se for multiplo de 5 checa por aliteracao. Prioridade: 5>3>default
- if(($params % 5) == 0)
- {
-  return checkAliteration($word1,$word2,$dict);
- }
+ $params //= 2;
  my @differentPronouncesOfWord1;
  my @differentPronouncesOfWord2; 
  my $index = 1;
@@ -148,8 +130,13 @@ sub rhymeFound{
   }
   $index++;
  }
+ if(($params % 5) == 0)
+ {
+  return checkAliteration(\@differentPronouncesOfWord1,\@differentPronouncesOfWord2);
+ }
  foreach my $first (@differentPronouncesOfWord1) 
  { 
+	my $stop = 0; #variavel que fica com valor 0 enquanto os fonemas forem iguais.
   (@phonemes) = split(/\s/,$first);
   #analisaremos a palavra de tras pra frente, buscando a ultima vogal  
   my @REVERSED_LIST1 = reverse(@phonemes);
@@ -158,9 +145,16 @@ sub rhymeFound{
    (@phonemes2) = split(/\s/,$second);
    my @REVERSED_LIST2 = reverse(@phonemes2);
    $index = 0;
-   while(isNotVowel($REVERSED_LIST1[$index],$REVERSED_LIST2[$index],$vowels,$params) == 1)
+   while(isNotVowel($REVERSED_LIST1[$index],$REVERSED_LIST2[$index],$vowels,$params) == 1 and ($stop == 0))
    {
-    $index++;#continua percorrendo o  array de fonemas
+		if($REVERSED_LIST1[$index] ne $REVERSED_LIST2[$index])
+    {
+     $stop = 1#caso em que um dos fonemas eh diferente encerra o loop
+    }
+    else
+    {
+     $index++;#continua percorrendo o  array de fonemas
+    }
    }
    #chegamos na ultima vogal de uma das palavras. Ambas as palavras possuem todos os fonemas iguais depois da vogal. Para que seja rima agora basta verificar se a ultima vogal tambem sao iguais (o ultimo digito de um fonema com vogal pode ser ou 0, ou 1, ou 2, por isso excluiremos esse numero para fins de comparacao).
    if( (substr $REVERSED_LIST1[$index],0,2) eq (substr $REVERSED_LIST2[$index],0,2) )

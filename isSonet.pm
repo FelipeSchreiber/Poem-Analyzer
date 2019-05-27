@@ -54,19 +54,32 @@ sub isSonnet{
     {
      @aux = split(/\s/,$data->{(substr($words[$var],0,(length($words[$var]) - 1)))});#tenta ver se encontra a palavra no singular
     }
+
     if(substr($words[$var],-2,2) eq "ed")
     {
-     @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 2)});#tenta achar verbo conjugado no infinitivo
+     if(exists $data->{substr($words[$var],0,length($words[$var]) - 3)} )
+     {
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)});#caso em que alem do "-ed" acrescentado a ultima consoante foi duplicada ex: stopped
+     }
+     if(exists $data->{substr($words[$var],0,length($words[$var]) - 3)."y"} )
+     {
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)."y"});#caso em que o verbo termina em "y" ex: studied. Tambem contempla o caso de palavras terminadas em y com vogal antes. Ex: enjoyed
+     }
+     if(exists $data->{substr($words[$var],0,length($words[$var]) - 1)} )
+     {
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 1)});#caso em que o verbo terminado em "-e" foi acrescido do "d" ex: loved
+     }		 
     }
+
     if(substr($words[$var],-3,3) eq "ing")
     {
      if(exists $data->{substr($words[$var],0,length($words[$var]) - 3)})
      {
-      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)});#tenta achar verbo conjugado no infinitivo ex.swimming
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)});#tenta achar verbo conjugado no infinitivo ex.listening
      }
      if(exists $data->{substr($words[$var],0,length($words[$var]) - 3)."e"} )
      {
-      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)});#caso em que o "E" foi substituido por "ing" ex.racing
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)."e"});#caso em que o "E" foi substituido por "ing" ex.racing
      }
      if(exists $data->{substr($words[$var],0,length($words[$var]) - 4)} )
      {

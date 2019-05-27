@@ -12,6 +12,7 @@ our @EXPORT = qw( loadDatabase );
 
 sub loadDatabase{
  my $database = shift;#dicionario que sera usado para separar as palavras em silabas
+ $database //= "mhyph.txt";
  #print $database, "\n";
  my $line;
  my %dict;

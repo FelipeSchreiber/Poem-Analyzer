@@ -17,7 +17,7 @@ sub isSonnet{
   $isSonet = 0;
  }
  seek $fDescriptor, 0, 0;#retorna para o inicio do arquivo
- my $data = loadDatabase("mhyph.txt");#carrega o dicionario de silabas
+ my $data = loadDatabase("mhyph.txt");#carrega o dicionario de hyphenation(que usaremos pra se aproximar da silabificacao)
  #print "\n\n";
  while(my $line = <$fDescriptor>)
  {
@@ -42,23 +42,36 @@ sub isSonnet{
     {
      @aux = split(/\s/,$data->{(substr($words[$var],0,(length($words[$var]) - 1)))});#tenta ver se encontra a palavra no singular
     }
+
     if(substr($words[$var],-2,2) eq "ed")
     {
-     @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 2)});#tenta achar verbo conjugado no infinitivo
+     if(exists $data->{substr($words[$var],0,length($words[$var]) - 3)} )
+     {
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)});#caso em que alem do "-ed" acrescentado a ultima consoante foi duplicada ex: stopped
+     }
+     if(exists $data->{substr($words[$var],0,length($words[$var]) - 3)."y"} )
+     {
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)."y"});#caso em que o verbo termina em "y" ex: studied. Tambem contempla o caso de palavras terminadas em y com vogal antes. Ex: enjoyed
+     }
+     if(exists $data->{substr($words[$var],0,length($words[$var]) - 1)} )
+     {
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 1)});#caso em que o verbo terminado em "-e" foi acrescido do "d" ex: loved
+     }		 
     }
+
     if(substr($words[$var],-3,3) eq "ing")
     {
      if(exists $data->{substr($words[$var],0,length($words[$var]) - 3)})
      {
-      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)});#tenta achar verbo conjugado no infinitivo
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)});#tenta achar verbo conjugado no infinitivo ex.listening
      }
      if(exists $data->{substr($words[$var],0,length($words[$var]) - 3)."e"} )
      {
-      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)});#caso em que o "E" foi substituido por "ing"
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 3)."e"});#caso em que o "E" foi substituido por "ing" ex.racing
      }
      if(exists $data->{substr($words[$var],0,length($words[$var]) - 4)} )
      {
-      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 4)});#caso em que a ultima letra eh duplicada
+      @aux = split(/\s/,$data->{substr($words[$var],0,length($words[$var]) - 4)});#caso em que a ultima letra eh duplicada ex.hitting
      }
     }
    }
@@ -99,7 +112,7 @@ sub isSonnet{
 my$fd;
 open($fd, "<", "file2.txt") or die "Couldn't open the file, $!";
 #print "\nFD: ".$fd."\n";
-my $mode = 1;
+my $mode = 2;
 if(isSonnet($fd,$mode) == 1)
 {
  print "\nIS SONNET\n";
