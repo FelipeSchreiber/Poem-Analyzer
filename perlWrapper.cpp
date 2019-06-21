@@ -28,8 +28,8 @@ int perlWrapper::getSonetAnalysis(int fd, int mode){
 	XPUSHs(sv_2mortal(newSViv(fd)));
 	XPUSHs(sv_2mortal(newSViv(mode)));
 	PUTBACK;
-	string isSonnet("isSonnet");
-	call_pv(isSonnet.c_str(),G_SCALAR);
+	string func("isSonnet");
+	call_pv(func.c_str(),G_SCALAR);
 	SPAGAIN;
 
 	int res = POPi;
@@ -47,13 +47,38 @@ int perlWrapper::getFileStats(int fd,vector<int>*save){
 	PUSHMARK(SP);	//lembra ponteiro na pilha
 	XPUSHs(sv_2mortal(newSViv(fd)));
 	PUTBACK;
-	string fs("fileStats");
-	call_pv(fs.c_str(),G_ARRAY);
+	string func("fileStats");
+	call_pv(func.c_str(),G_ARRAY);
 	SPAGAIN;
   for(int j = 0; j<3; j++)
 	{
 		save->push_back(POPi);		
-		cout<<"\nOK\n";
+		//cout<<"\nOK\n";
+	}
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+  return 0;
+}
+
+int perlWrapper::getRepetitions(int fd,vector<string>*palavras,vector<int>*frequencia){
+	dSP;				//inicializa o ponteiro da pilha
+	ENTER;
+	SAVETMPS;		//variavel temporaria
+	PUSHMARK(SP);	//lembra ponteiro na pilha
+	XPUSHs(sv_2mortal(newSViv(fd)));
+	PUTBACK;
+	string func("interfaceCountRep");
+	call_pv(func.c_str(),G_ARRAY);
+	SPAGAIN;
+	int vectorLength = POPi;
+  for(int j = 0; j<vectorLength/2; j++)
+	{
+		STRLEN len;
+    const char *s = SvPVx(POPs, len);
+		string temp(s);
+    palavras->push_back(temp);
+		frequencia->push_back(POPi);
 	}
 	PUTBACK;
 	FREETMPS;

@@ -16,7 +16,9 @@ sub turnLower{
 }
 
 sub contPalavras{
-	my $fDescriptor = shift;
+	my $fd = shift;
+  my $fDescriptor;
+  open($fDescriptor, "<&=$fd");
 	my %countRes = ("NULL" => [-1]);
 	while(my $line = <$fDescriptor>){
 		my @words = split /\s+/,$line;
@@ -37,14 +39,28 @@ sub contPalavras{
 	}
 
 	delete $countRes{"NULL"};
+	close($fDescriptor) || die "Couldn't close file properly";
 	return \%countRes;
 }
 
-open(my $fd, "<", "file.txt") or die "Couldn't open the file, $!";
-my $resPtr = contPalavras($fd);
-my %resultado = %{$resPtr}; undef $resPtr;
-foreach my $key (keys %resultado){
-	print"\n$key: @{%resultado{$key}}[0]";
+sub interfaceCountRep{
+	my $fD = shift;	
+	my $resPtr = contPalavras($fD);
+	my @vector;
+	my %resultado = %{$resPtr}; undef $resPtr;
+	foreach my $key (keys %resultado){
+		#print"\n$key: @{%resultado{$key}}[0]";
+		push @vector, @{%resultado{$key}}[0];
+		push @vector, $key;
+	}
+	return @vector,scalar @vector;
 }
-close $fd;
-print"\n";
+
+#open(my $fd, "<", "file.txt") or die "Couldn't open the file, $!";
+#my $resPtr = contPalavras($fd);
+#my %resultado = %{$resPtr}; undef $resPtr;
+#foreach my $key (keys %resultado){
+#	print"\n$key: @{%resultado{$key}}[0]";
+#}
+#close $fd;
+#print"\n";

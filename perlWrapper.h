@@ -14,6 +14,7 @@ class perlWrapper{
 		void runInterpreterWithPerlFile(char *filename);
 		int getFileStats(int fd,vector<int>*save);
 		int getSonetAnalysis(int fd, int mode);
+		int getRepetitions(int fd,vector<string>*palavras,vector<int>*frequencia);
 		int getInputFileInfo(string inputFile, string perlFunc);
 	private:
 		PerlInterpreter *my_perl;

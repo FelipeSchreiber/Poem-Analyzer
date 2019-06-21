@@ -81,7 +81,26 @@ int main(){
 							*/
 		          case 5:
 		          {
-								
+								 perlwrapper.runInterpreterWithPerlFile("countReptitions.pl");
+                  cout<<"\nDigite o nome do arquivo que deseja abrir: "<<endl;
+									getline(cin,filename);
+									int fileDescriptor = open (filename.c_str(), O_RDONLY);
+                  if(fileDescriptor > 0)//open retorna -1 em caso de erro 
+                  {
+											cout<<"\nFD: "<<fileDescriptor<<endl;
+											vector<int> frequencia;
+											vector<string> palavras;
+											perlwrapper.getRepetitions(fileDescriptor, &palavras, &frequencia);
+											for(int i = 0; i<palavras.size(); i++ )						
+											{
+												cout<<palavras[i]<<": "<<frequencia[i]<<endl;
+											}
+                  	  
+                  }
+									else
+                  {
+											cout<<"\nUm problema ocorreu na abertura do arquivo"<<endl;
+                  }
 							}
 		          break;
 							
