@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fcntl.h>
 #include <string>
+#include <vector>
 #include "perlWrapper.h"
 
 using namespace std;
@@ -40,27 +41,50 @@ int main(){
 									int fileDescriptor = open (filename.c_str(), O_RDONLY);
                   if(fileDescriptor > 0)//open retorna -1 em caso de erro 
                   {
-											cout<<"\nFD: "<<fileDescriptor<<endl;
+											//cout<<"\nFD: "<<fileDescriptor<<endl;
 											if( perlwrapper.getSonetAnalysis(fileDescriptor,2) )
                   	  {
-													cout<<"\nIS SONNET\n"<<endl;
+													cout<<"\nÉ soneto\n"<<endl;
                   	  }
                   }
-               }
-		           break;
+									else
+                  {
+											cout<<"\nUm problema ocorreu na abertura do arquivo"<<endl;
+                  }
+              }
+		          break;
 
-		          /*case 3:
-		               //your code here
-		               break;
+		          case 3:
+		          {
+									perlwrapper.runInterpreterWithPerlFile("fileStats.pl");
+                  cout<<"\nDigite o nome do arquivo que deseja abrir: "<<endl;
+									getline(cin,filename);
+									int fileDescriptor = open (filename.c_str(), O_RDONLY);
+                  if(fileDescriptor > 0)//open retorna -1 em caso de erro 
+                  {
+											cout<<"\nFD: "<<fileDescriptor<<endl;
+											vector<int> fileStats;
+											perlwrapper.getFileStats(fileDescriptor, &fileStats);
+											cout<<"Total de palavras: "<<fileStats[2]<<" Total de versos: "<<fileStats[1]<<" Total de estrofes: "<<fileStats[0]<<endl;
+                  	  
+                  }
+									else
+                  {
+											cout<<"\nUm problema ocorreu na abertura do arquivo"<<endl;
+                  }
+							}
+		          break;
 
-		          case 4:
-		               //your code here
-		               break;
-
-		          case 5:
+		          /*case 4:
 		               //your code here
 		               break;
 							*/
+		          case 5:
+		          {
+								
+							}
+		          break;
+							
 		          case 6:
 							{
 									 //user wants to quit

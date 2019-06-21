@@ -40,6 +40,27 @@ int perlWrapper::getSonetAnalysis(int fd, int mode){
 	return res;
 }
 
+int perlWrapper::getFileStats(int fd,vector<int>*save){
+	dSP;				//inicializa o ponteiro da pilha
+	ENTER;
+	SAVETMPS;		//variavel temporaria
+	PUSHMARK(SP);	//lembra ponteiro na pilha
+	XPUSHs(sv_2mortal(newSViv(fd)));
+	PUTBACK;
+	string fs("fileStats");
+	call_pv(fs.c_str(),G_ARRAY);
+	SPAGAIN;
+  for(int j = 0; j<3; j++)
+	{
+		save->push_back(POPi);		
+		cout<<"\nOK\n";
+	}
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+  return 0;
+}
+
 int perlWrapper::getInputFileInfo(string inputFile, string perlFunc){
 	dSP;				//inicializa o ponteiro da pilha
 	ENTER;

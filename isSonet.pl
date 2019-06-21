@@ -3,7 +3,8 @@ use fileStats;
 use syllableSeparator;
 
 sub isSonnet{
- my $fDescriptor = shift;
+ my $fd = shift;
+ open(my $fDescriptor, "<&=$fd");
  my $mode = shift;#modo de achar rimas
  my @words;
  my @aux;
@@ -112,16 +113,17 @@ sub isSonnet{
  {
   print "\nSPENSERIAN SONNET\n";
  }
- print "\n".$padraoVer."\n";
+ #print "\n".$padraoVer."\n";
+ close($fDescriptor) || die "Couldn't close file properly";
  return $isSonet;
 }
 
-my$fd;
-open($fd, "<", "file2.txt") or die "Couldn't open the file, $!";
+#my$fd;
+#open($fd, "<", "file2.txt") or die "Couldn't open the file, $!";
 #print "\nFD: ".$fd."\n";
-my $mode = 2;
-if(isSonnet($fd,$mode) == 1)
-{
- print "\nIS SONNET\n";
-}
+#my $mode = 2;
+#if(isSonnet($fd,$mode) == 1)
+#{
+# print "\nIS SONNET\n";
+#}
 

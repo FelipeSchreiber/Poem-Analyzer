@@ -2,6 +2,7 @@
 #include "/usr/lib/x86_64-linux-gnu/perl/5.22.1/CORE/EXTERN.h"
 #include <perl.h>
 #include <string>
+#include <vector>
 #include <iostream>
 
 using namespace std;
@@ -11,6 +12,7 @@ class perlWrapper{
 		perlWrapper();
 		~perlWrapper();
 		void runInterpreterWithPerlFile(char *filename);
+		int getFileStats(int fd,vector<int>*save);
 		int getSonetAnalysis(int fd, int mode);
 		int getInputFileInfo(string inputFile, string perlFunc);
 	private:
