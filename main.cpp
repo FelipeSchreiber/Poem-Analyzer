@@ -1,12 +1,13 @@
 #include <iostream>
 #include <fcntl.h>
 #include <string>
+#include "heap.h"
 #include <vector>
 #include "perlWrapper.h"
 
 using namespace std;
 
-void ShowMenu(); 
+void ShowMenu();
 int main(){
 	bool Quit = false;
 	string userInput;
@@ -81,19 +82,18 @@ int main(){
 							*/
 		          case 5:
 		          {
-								 perlwrapper.runInterpreterWithPerlFile("countReptitions.pl");
+               		Heap<myClass> palavras;
+  								perlwrapper.runInterpreterWithPerlFile("countReptitions.pl");
                   cout<<"\nDigite o nome do arquivo que deseja abrir: "<<endl;
 									getline(cin,filename);
 									int fileDescriptor = open (filename.c_str(), O_RDONLY);
                   if(fileDescriptor > 0)//open retorna -1 em caso de erro 
                   {
-											cout<<"\nFD: "<<fileDescriptor<<endl;
-											vector<int> frequencia;
-											vector<string> palavras;
-											perlwrapper.getRepetitions(fileDescriptor, &palavras, &frequencia);
-											for(int i = 0; i<palavras.size(); i++ )						
+											perlwrapper.getRepetitions(fileDescriptor, &palavras);
+											while(!palavras.is_empty())
 											{
-												cout<<palavras[i]<<": "<<frequencia[i]<<endl;
+												myClass *ptr = palavras.pop();
+												cout<<ptr->vertexId<<": "<<ptr->value<<endl;
 											}
                   	  
                   }

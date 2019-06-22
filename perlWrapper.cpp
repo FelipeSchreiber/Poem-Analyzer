@@ -61,7 +61,7 @@ int perlWrapper::getFileStats(int fd,vector<int>*save){
   return 0;
 }
 
-int perlWrapper::getRepetitions(int fd,vector<string>*palavras,vector<int>*frequencia){
+int perlWrapper::getRepetitions(int fd,Heap<myClass>*palavras){
 	dSP;				//inicializa o ponteiro da pilha
 	ENTER;
 	SAVETMPS;		//variavel temporaria
@@ -77,8 +77,8 @@ int perlWrapper::getRepetitions(int fd,vector<string>*palavras,vector<int>*frequ
 		STRLEN len;
     const char *s = SvPVx(POPs, len);
 		string temp(s);
-    palavras->push_back(temp);
-		frequencia->push_back(POPi);
+    myClass *palavra = new myClass(temp,POPi);
+		palavras->insert(palavra);
 	}
 	PUTBACK;
 	FREETMPS;
