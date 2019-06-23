@@ -21,11 +21,17 @@ sub getHighestKey{
 }
 
 sub determinaRima{
-	my @palavras = @{$_[0]};
+	my @palavras;
+	#print "PALAVRAS: "."\n";
+	foreach my $v (@_) 
+	{
+		#print $v."\n";
+		push @palavras,$v;
+	}
   my @palavras2;
   my $firstWordToInclude;
   my @notFound;
-  my $mode = $_[1];#determina o tipo de operacao conforme explicitado em rhymeFound
+  my $mode = pop @palavras;#determina o tipo de operacao conforme explicitado em rhymeFound
 	#aqui entra o divisor ou estrator da ultima silaba
   my $dictionary = loadPhonemes("cmudict-0.7b");
   my %vowels;
@@ -91,8 +97,7 @@ sub determinaRima{
 			}
 			if ($inserted != 1){
 				++$curChar;
-        #print "NEW TABLE: ".$curChar." FOR WORD: ".$palavra."\n" ;
-				%hashRimas = (%hashRimas, $curChar => [$palavra]);
+        %hashRimas = (%hashRimas, $curChar => [$palavra]);
 				$string = $string.$curChar;
 			}
 		}
@@ -104,5 +109,31 @@ sub determinaRima{
   print "-----------------------------------------------------------------\n\n";
   return ($string,\%hashRimas);
 }
+
+sub interfaceDetRima{
+	my @vector;
+	my @returningVector;
+	foreach my $v (@_) 
+	{
+		push @vector,$v;
+	}
+	my $mode = pop @vector;
+	for my $i (0 .. $#vector)
+	{
+      $vector[$i]=~ s/[^a-zA-Z "\-"\s]//g; #remove todos os caracteres diferentes de letras, espaco ou hifen
+	}
+	my ($padraoVer, $rimasEncPtr) = determinaRima(@vector,$mode);
+	my %rimasEnc = %{$rimasEncPtr}; undef $rimasEncPtr;
+	foreach my $key (sort keys %rimasEnc){
+		foreach my $word (@{$rimasEnc{$key}}){
+			push @returningVector,$word;
+		}
+		push @returningVector,scalar @{$rimasEnc{$key}};
+		push @returningVector,$key;
+	}
+	push @returningVector, $padraoVer;
+	return @returningVector;
+}
+
 
 1;

@@ -12,9 +12,9 @@ class myClass{
 		 string vertexId;
 		 myClass(myClass & m):value(m.value),vertexId(m.vertexId){};
 		 int value;
-     bool operator<(myClass &b)
+     bool operator<(myClass &b)//faz com que a ordenacao seja do maior pro menor, alterando o comportamento default do heap
      {
-				return this->value < b.value;
+				return this->value > b.value;
      }
 };
 
@@ -57,7 +57,7 @@ class Heap
 {
  public:
 	unsigned int get_size();
-	const T* get_root();
+	const T* front();
 	Heap();
 	Heap(Heap<T> &h);
 	~Heap();
@@ -75,7 +75,7 @@ class Heap
 };
 
 template <class T>
-const T* Heap<T>::get_root()
+const T* Heap<T>::front()
 {
 	return this->root->member;
 }
@@ -388,14 +388,15 @@ T*Heap<T>::pop ()
    this->size -= 1;//decrementa o tamanho do heap
    wrapper<T> *r = this->root;
 	 T* ptr = r->member;
-	 delete r;
 	 if (r->child == NULL)//checa se o no raiz possui filhos
    {
     this->root = NULL;//se nao possuir entao a raiz do heap passa a ser NULL, isto eh, o heap esta vazio
+		delete r;
 		return ptr;
    }
    //caso contrario, o no raiz possui filhos e portanto eh necessario efetuar um merge entre as subarvores do no raiz a fim de obter a nova raiz
    this->root = this->mergeSubheaps (this->root);
+	 delete r;
    return ptr;
   }
   return NULL;

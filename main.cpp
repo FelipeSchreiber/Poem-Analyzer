@@ -1,121 +1,98 @@
 #include <iostream>
-#include <fcntl.h>
 #include <string>
 #include "heap.h"
 #include <vector>
+#include "runPerl.h"
 #include "perlWrapper.h"
 
 using namespace std;
-
-void ShowMenu();
 int main(){
 	bool Quit = false;
-	string userInput;
 	perlWrapper perlwrapper;
-	string filename;
 	int choice = 7;
 	while(!Quit) {
-		   ShowMenu();
-		   getline(cin,userInput);
-			 if(userInput.length() == 1)
-			 {
-       		choice = *(userInput.c_str() ) - '0';//converte char para inteiro
-       	  if(choice <= 0 || choice >= 7)
-						choice = 7;//em caso da conversao nao ser possivel coloca um valor fora do intervalo [1,6]
-			 }
-			 else
-       {
-					choice = 7;
-       }
+		   choice = ShowMenu();
 		   switch (choice) {
 		          case 1:
 							{
-
+									string path;
+									printf("\e[1;1H\e[2J");		
+									cout<<"\nDigite o caminho até o diretorio desejado: \n"<<endl;
+									getline(cin,path);
+									ls(path);							
 							}
 		          break;
 
 		          case 2:
               {
-		              perlwrapper.runInterpreterWithPerlFile("isSonet.pl");
-                  cout<<"\nDigite o nome do arquivo que deseja abrir: "<<endl;
-									getline(cin,filename);
-									int fileDescriptor = open (filename.c_str(), O_RDONLY);
-                  if(fileDescriptor > 0)//open retorna -1 em caso de erro 
-                  {
-											//cout<<"\nFD: "<<fileDescriptor<<endl;
-											if( perlwrapper.getSonetAnalysis(fileDescriptor,2) )
-                  	  {
-													cout<<"\nÉ soneto\n"<<endl;
-                  	  }
-                  }
+									printf("\e[1;1H\e[2J");
+		              if( runIsSonet(perlwrapper) )
+									{
+										cout<<"\nÉ soneto\n"<<endl;
+									}
 									else
-                  {
-											cout<<"\nUm problema ocorreu na abertura do arquivo"<<endl;
-                  }
+									{
+										cout<<"\nNao é soneto\n"<<endl;
+									}
               }
 		          break;
 
 		          case 3:
 		          {
-									perlwrapper.runInterpreterWithPerlFile("fileStats.pl");
-                  cout<<"\nDigite o nome do arquivo que deseja abrir: "<<endl;
-									getline(cin,filename);
-									int fileDescriptor = open (filename.c_str(), O_RDONLY);
-                  if(fileDescriptor > 0)//open retorna -1 em caso de erro 
-                  {
-											cout<<"\nFD: "<<fileDescriptor<<endl;
-											vector<int> fileStats;
-											perlwrapper.getFileStats(fileDescriptor, &fileStats);
-											cout<<"Total de palavras: "<<fileStats[2]<<" Total de versos: "<<fileStats[1]<<" Total de estrofes: "<<fileStats[0]<<endl;
-                  	  
-                  }
-									else
-                  {
-											cout<<"\nUm problema ocorreu na abertura do arquivo"<<endl;
-                  }
+									printf("\e[1;1H\e[2J");									
+									vector<int> fileStats;
+									if( runStats(perlwrapper,&fileStats,-1) )
+									{
+										cout<<"\nTotal de palavras: "<<fileStats[2]<<" Total de versos: "<<fileStats[1]<<" Total de estrofes: "<<fileStats[0]<<endl;
+									}
 							}
 		          break;
 
-		          /*case 4:
-		               //your code here
-		               break;
-							*/
+		          case 4:
+		          {	
+									printf("\e[1;1H\e[2J");
+									vector<vector<string> > retorno;
+									runDetRima(perlwrapper,retorno);
+                  cout<<"\nPadrao de rimas encontrado: "<<retorno[0][0]<<endl;
+									cout<<"\nRimas encontradas: "<<endl;
+									for(int i = 1;i<retorno.size();i++)	
+									{
+										for(int j = 0; j<retorno[i].size(); j++)
+											cout<<retorno[i][j]<<"||";
+										cout<<"\n";
+									}
+									cout<<"\n";
+							}
+		          break;
+							
 		          case 5:
 		          {
+									printf("\e[1;1H\e[2J");
                		Heap<myClass> palavras;
-  								perlwrapper.runInterpreterWithPerlFile("countReptitions.pl");
-                  cout<<"\nDigite o nome do arquivo que deseja abrir: "<<endl;
-									getline(cin,filename);
-									int fileDescriptor = open (filename.c_str(), O_RDONLY);
-                  if(fileDescriptor > 0)//open retorna -1 em caso de erro 
-                  {
-											perlwrapper.getRepetitions(fileDescriptor, &palavras);
-											while(!palavras.is_empty())
-											{
-												myClass *ptr = palavras.pop();
-												cout<<ptr->vertexId<<": "<<ptr->value<<endl;
-											}
-                  	  
-                  }
-									else
-                  {
-											cout<<"\nUm problema ocorreu na abertura do arquivo"<<endl;
-                  }
+									if( runRepetitions(perlwrapper, palavras) )
+									{								
+										while(!palavras.is_empty())
+										{
+													myClass *ptr = palavras.pop();
+													cout<<ptr->vertexId<<": "<<ptr->value<<endl;
+										}
+									}
 							}
 		          break;
 							
 		          case 6:
 							{
-									 //user wants to quit
-		               Quit = true;  //execution continues after the switch
-		                //or do this to end program
-		               //return 0;
+										printf("\e[1;1H\e[2J");
+										cout<<"Saindo..."<<endl;			
+			               Quit = true;
 							}
 		          break;
 
 		          default:
 							{
-		                std::cout << "Bad Input, Try again " << std::endl;
+										
+										printf("\e[1;1H\e[2J");
+		                cout << "Bad Input, Try again " << endl;
 							}
 		          break;
 		   }
@@ -125,13 +102,4 @@ int main(){
 return 0;
 } //end of main
 
-void ShowMenu() {
-cout << "-------------------------OPCOES--------------------------------------\n";
-		cout << "1 - Listar poemas\n";
-		cout << "2 - Classificar poema: Soneto?\n";
-		cout << "3 - Dados gerais do poema (numero de palavras, versos e estrofes)\n";
-		cout << "4 - Achar Rimas\n";
-    cout << "5 - Achar Repeticoes\n";
-		cout << "6 - Sair\n";
-		cout << "Digite o numero correspondente a operacao desejada: " << endl;
-}
+

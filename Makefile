@@ -8,7 +8,7 @@ all: programa
 .cpp.o:
 	$(CPP) $(CPPFLAGS) -o $@ -c $<
 
-programa: main.o perlWrapper.o
+programa: main.o perlWrapper.o runPerl.o
 	$(LD) -o $@ $? $(LDFLAGS)
 
 clean:

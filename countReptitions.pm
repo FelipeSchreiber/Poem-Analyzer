@@ -1,5 +1,4 @@
 package countReptitions;
-use strict;
 use warnings;
 use utf8;
 use Exporter 'import';
@@ -9,6 +8,7 @@ our @ISA= qw( Exporter );
 # these CAN be exported.
 our @EXPORT_OK = qw( contPalavras turnLower );
 our @EXPORT = qw( contPalavras );
+
 
 sub turnLower{
 	my $word = ${$_[0]};
@@ -26,7 +26,9 @@ sub turnLower{
 }
 
 sub contPalavras{
-	my $fDescriptor = shift;
+	my $fd = shift;
+  my $fDescriptor;
+  open($fDescriptor, "<&=$fd");
 	my %countRes = ("NULL" => [-1]);
 	while(my $line = <$fDescriptor>){
 		my @words = split /\s+/,$line;
@@ -47,6 +49,7 @@ sub contPalavras{
 	}
 
 	delete $countRes{"NULL"};
+	close($fDescriptor) || die "Couldn't close file properly";
 	return \%countRes;
 }
 

@@ -28,7 +28,8 @@ int perlWrapper::getSonetAnalysis(int fd, int mode){
 	XPUSHs(sv_2mortal(newSViv(fd)));
 	XPUSHs(sv_2mortal(newSViv(mode)));
 	PUTBACK;
-	string func("isSonnet");
+	//string func("isSonnet");
+	string func("interfaceIsSonet");
 	call_pv(func.c_str(),G_SCALAR);
 	SPAGAIN;
 
@@ -47,7 +48,8 @@ int perlWrapper::getFileStats(int fd,vector<int>*save){
 	PUSHMARK(SP);	//lembra ponteiro na pilha
 	XPUSHs(sv_2mortal(newSViv(fd)));
 	PUTBACK;
-	string func("fileStats");
+	//string func("fileStats");
+	string func("interfaceFileStats");
 	call_pv(func.c_str(),G_ARRAY);
 	SPAGAIN;
   for(int j = 0; j<3; j++)
@@ -86,20 +88,67 @@ int perlWrapper::getRepetitions(int fd,Heap<myClass>*palavras){
   return 0;
 }
 
-int perlWrapper::getInputFileInfo(string inputFile, string perlFunc){
+int perlWrapper::getRima(vector<vector<string> >*retorno, vector<string> &palavras,int mode){
 	dSP;				//inicializa o ponteiro da pilha
 	ENTER;
 	SAVETMPS;		//variavel temporaria
 	PUSHMARK(SP);	//lembra ponteiro na pilha
-	XPUSHs(sv_2mortal(newSVpv(inputFile.c_str(),inputFile.length())));
+	for(unsigned int i = 0;i<palavras.size();i++)
+	{
+		XPUSHs(sv_2mortal(newSVpv(palavras[i].c_str(),palavras[i].length())));
+	}	
+	XPUSHs(sv_2mortal(newSViv(mode)));
 	PUTBACK;
-	call_pv(perlFunc.c_str(),G_SCALAR);
+	string func("interfaceDetRima");
+	int vectorLength = call_pv(func.c_str(),G_ARRAY);//obtem o tamanho da pilha
 	SPAGAIN;
+	vector<string> padraoVer;
+	STRLEN len;
+  const char *s = SvPVx(POPs, len);
+	string temp(s);
+	padraoVer.push_back(temp);
+	(*retorno).push_back(padraoVer);//retorno 0 contem o padrao da rima
+	vectorLength--;//foi retirado um elemento da pilha
+	int i = 0;
+	int curState = 0;//usado para fazer uma maquina de estados
+	int curKeyLength = 0;//variavel que determina quantas palavras possui a chave atual no hash
+	vector<string> *str;//variavel que contem chave do hash pelo perl e o array correspondente
+	while(i<vectorLength)	
+	{		
+		switch (curState) 
+		{
+								case 0://lê a chave atual passada e o tamanho do vetor associado a ela
+								{
+									str = new vector<string>;
+									STRLEN len;
+  								const char *s = SvPVx(POPs, len);
+									string chave(s);
+									str->push_back(chave);//coloca a chave do hash no novo vetor
+									curKeyLength = POPi;//lê qual o tamanho do vetor associado aquela chave
+									i += 2;//retiramos dois elementos do vetor passado pelo perl
+									curState = 1;
+								}
+				        break;
 
-	int res = POPi;
+				        case 1://coloca as palavras do vetor recem criado
+								{
+									for(int j = 0; j<curKeyLength; j++)
+									{
+										STRLEN len;
+										const char *s = SvPVx(POPs, len);
+										string newWord(s);
+										str->push_back(newWord);
+										i++;
+									}
+									(*retorno).push_back(*str);
+									curState = 0;
+								}
+				     		break;
+		}
+	}
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
-
-	return res;
+  return 0;
 }
+
