@@ -25,6 +25,7 @@ sub contPalavras{
 		foreach my $word (@words){
 			my $found = 0;
 			$word = turnLower(\$word);
+			$word=~ s/[^a-zA-Z \'"\-"\s]//g;
 			foreach my $key (%countRes){
 				if ($word eq $key){
 					++@{%countRes{$key}}[0];
